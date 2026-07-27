@@ -1,0 +1,73 @@
+# ─── Vendored gxp-driven-dev toolkit — NOT part of this product ──────────────
+# This is a STANDALONE consumer project (see docs/project-layout.md § "Two supported
+# layouts"). The toolkit has its own repository — github.com/aristo-Cat/gxp-driven-dev,
+# pinned here at commit dd91827 (see README § Tooling). Its files are present on this
+# machine so the /gdd.* commands resolve, but they never enter this repo's history.
+/skills/
+/templates/
+/patterns/
+/docs/
+/adapters/
+/examples/
+/.claude/
+/.codex/
+/.agents/
+/.githooks/
+/.github/
+/MEMORY.md
+/THIRD-PARTY-NOTICES.md
+
+# ─── Local working state (not published) ─────────────────────────────────────
+# STATE.md holds the project's living memory: decisions, open questions, toolkit
+# gaps. Deliberately local — see README § What is here.
+STATE.md
+PROGRESS.md
+/Plans/
+
+# Anti-leak overlay — organization-specific patterns. NEVER commit.
+.leak-overlay.txt
+
+# ─── Secrets / credentials — defense in depth ────────────────────────────────
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.secret
+secrets.*
+credentials.*
+id_rsa*
+*_rsa
+.netrc
+
+# ─── OS / IDE ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+.obsidian/
+.~lock.*
+
+# ─── Language tooling ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+node_modules/
+npm-debug.log
+.pnpm-debug.log
+
+# ─── Build artifacts / scratch ───────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
+.tmp/
+tmp/
+*.tmp.md
+*~
+*.stackdump

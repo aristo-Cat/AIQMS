@@ -1,0 +1,14 @@
+AI-QMS — AI-first electronic Quality Management System
+Copyright 2026 The AI-QMS authors
+
+Licensed under the Apache License, Version 2.0 (see the LICENSE file).
+
+The specifications, protocols and traceability artifacts in this repository are
+instantiated from templates published by gxp-driven-dev
+(https://github.com/aristo-Cat/gxp-driven-dev), Copyright 2026 The gxp-driven-dev
+authors, licensed under the Apache License, Version 2.0. The toolkit itself is not
+redistributed here; this project consumes it at the pinned commit recorded in README.
+
+Regulatory references (FDA 21 CFR Part 11, EU GMP Annex 11, EU GMP Annex 22, ICH,
+ISPE GAMP 5, GDPR) are cited from public regulatory literature. No proprietary or
+organization-internal documentation is reproduced in this repository.

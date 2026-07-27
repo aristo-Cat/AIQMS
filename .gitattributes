@@ -1,0 +1,3 @@
+# Line endings: LF in the repository and in the working tree, on every platform.
+# Shell scripts with CRLF fail under sh — this prevents that class of breakage.
+* text=auto eol=lf
