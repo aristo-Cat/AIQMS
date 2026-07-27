@@ -7,6 +7,10 @@ and evidence in this repo belong to it. `CLAUDE.md` imports this file via `@AGEN
 
 ## How to work here
 
+- **Read `STATE.md` first.** It is this project's living memory — identity, cascade position,
+  the numbered decisions, known toolkit gaps and the open questions. It is git-ignored on
+  purpose (local working state), so it is not in a fresh clone: if it is missing, say so rather
+  than reconstructing it from the specs.
 - `.gxp-dev.yaml` at this root is the manifest every skill reads first; move harness
   states only with `python skills/_scripts/transition-harness-state.py`.
 - Author the target system's artifacts through the toolkit commands (`/gdd.next` routes;
