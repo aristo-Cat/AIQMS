@@ -97,8 +97,16 @@ harnesses:
     isolation:
       enabled: false
       mode: metadata_only
-    active_work_item: null
-    work_items: []
+    active_work_item: WI-001
+    work_items:
+      - id: WI-001
+        title: "Record Spine and Deviation — create, open with signature, QA Triage, segregation invariant, audit trail"
+        type: feature
+        status: intake
+        sdd: true
+        interaction: hitl
+        spec_refs:
+          - specs/URS.md
     gates:
       design_options: required
       research_review: required
