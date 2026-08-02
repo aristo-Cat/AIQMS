@@ -41,7 +41,7 @@ DDL goes through `apply_migration` and the file is then written to `supabase/mig
 **same version number the platform returns**, so `supabase migration list` compares cleanly later.
 Test-only objects go through `execute_sql` so they never enter the product stream.
 
-## The decision that blocks `apply_signature` — resolve this first
+## ~~The decision that blocks `apply_signature`~~ — RESOLVED, see `ADR-ESIG-001`
 
 `URS-ESIG-012` requires a **failed** signature attempt to be recorded. `THIN-SPECS.md` gives it a
 `security_event` table, and the independent review's finding 5 already noted the attempt is
@@ -58,7 +58,8 @@ Four ways out, with what each costs:
 | **C** | Savepoints | Does not help. A savepoint rolls back within the transaction; it cannot commit independently |
 | **D** | **`apply_signature` does not raise.** It writes the `security_event`, returns a typed failure, and `execute_transition` performs no state change and returns that failure. The transaction **commits**: the event is durable, the record is untouched | The caller must read a return value instead of relying on an exception |
 
-**Recommended: D.** It keeps the control inside the database where `ADR-DATA-001` put it, needs no
+**RESOLVED 2026-08-02 — D chosen by Juan Miguel Saavedra and recorded as `ADR-ESIG-001` (accepted).**
+The reasoning below is why. It keeps the control inside the database where `ADR-DATA-001` put it, needs no
 new extension and no stored credential, and its failure mode is benign — a caller that ignores the
 result still causes no state change, because the transition simply did not happen and the audit
 trail shows nothing changed. A and B both make the durability of a security record depend on

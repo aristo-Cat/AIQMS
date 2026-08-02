@@ -7,7 +7,7 @@ project_id: "AIQMS-2026-001"
 system_id: "AIQMS-2026-001"
 traces_to: "specs/URS.md (v0.1, draft)"
 status: draft
-version: "0.2"
+version: "0.3"
 created: "2026-08-02"
 updated: "2026-08-02"
 language: "en"
@@ -84,6 +84,7 @@ IDs follow `ADR-<CATEGORY>-NNN` using the canonical category codes of
 | `ADR-EREC-001` | Audit trail written by database trigger, attributed through an application-set session context | **accepted** | 2026-08-02 | `URS-EREC-005`, `URS-DATA-004`, `URS-FUNC-009`, `URS-EREC-013` |
 | `ADR-DATA-001` | Writes to GxP tables only through `SECURITY DEFINER` functions; direct DML revoked from the application role | **accepted** | 2026-08-02 | `URS-DATA-004`, `URS-FUNC-008`, `URS-FUNC-010`, `URS-FUNC-011`, `URS-FUNC-012`, `URS-FUNC-057` |
 | `ADR-DATA-002` | Every recorded instant carries its originating time zone in an adjacent column | **accepted** | 2026-08-02 | `URS-DATA-003`, `URS-EREC-005`, `URS-EREC-013`, `URS-UI-005` |
+| `ADR-ESIG-001` | A failed signature attempt returns a typed failure instead of raising, so its security record survives | **accepted** | 2026-08-02 | `URS-ESIG-012`, `URS-ESIG-014`, `URS-FUNC-011`, `URS-DATA-004` |
 
 ---
 
@@ -483,6 +484,76 @@ same grounds and by the same mechanism.
 
 ---
 
+### `ADR-ESIG-001` — A failed signature attempt returns a typed failure instead of raising, so its security record survives
+
+**Status:** `accepted`
+**Decision date:** 2026-08-02
+**Relates to:** `URS-ESIG-012`, `URS-ESIG-014`, `URS-FUNC-011`, `URS-DATA-004`
+
+> [!tip] Status: ACCEPTED — decision is final; implementation may proceed.
+
+#### 5.4.1 Context
+
+`URS-ESIG-012` requires failed signature attempts to be **recorded**. Under Direction A
+(`work/WI-001/RESEARCH-SLICES.md` §3) this system owns the signature credential, so the failure is
+this system's to record — nothing upstream sees it. `work/WI-001/THIN-SPECS.md` gives it a
+`security_event` table, and the independent review's finding 5 had already observed that the attempt
+would otherwise be invisible by construction.
+
+Implementing it surfaced what neither anticipated. `ADR-DATA-001` puts signature verification inside
+`apply_signature`, a `SECURITY DEFINER` function. The natural implementation writes the
+`security_event` row and then raises, so the caller sees a failure. **PostgreSQL rolls that row back
+with the rest of the transaction.** The record of the failure destroys itself, and
+`URS-ESIG-012` is satisfied in the source and unsatisfied in the database — the worst combination,
+because a reviewer reading the code would see the requirement met.
+
+This is not a coding slip that a careful implementer avoids. Every in-transaction way of recording
+the failure has the same fate, because a transaction is atomic by definition. The requirement and
+the exception contract are in direct conflict.
+
+#### 5.4.2 Decision
+
+**`apply_signature` does not raise on a failed verification.** It writes the `security_event` row,
+returns a typed failure, and `execute_transition` — seeing that failure — performs no state change
+and returns the failure to the caller. **The transaction commits**: the security event is durable,
+the quality record is untouched, and the audit trail correctly shows that nothing changed.
+
+Raising is reserved for conditions that are genuine faults rather than expected outcomes — an
+unknown record, an undeclared transition, a missing session context. A wrong password is an expected
+outcome of a control working correctly, and it is the one outcome that must leave a trace.
+
+#### 5.4.3 Alternatives considered
+
+| Alternative | Why rejected |
+|---|---|
+| **`dblink` as an autonomous transaction** — write the event through a self-connection that commits independently | Genuinely works, and `dblink` is available on this platform. Rejected because it requires a foreign server and a user mapping holding a **database password in the catalogue**, to make durable a record the database could already have made durable by not throwing it away. It also adds an extension and a stored credential as configuration items under `URS-QUAL-004`, both inside the control that protects electronic signatures |
+| **The application writes the event in a separate transaction after catching the error** | Puts the durability of a security record back into the application. If the process dies between the failure and the write, the failed attempt is invisible — and `ADR-DATA-001` exists precisely because controls that depend on the application being well-behaved are not controls |
+| **Savepoints** | Do not help at all. A savepoint rolls back *within* a transaction; it cannot commit independently of it |
+
+#### 5.4.4 Consequences
+
+**Positive.** The control stays wholly inside the database, where `ADR-DATA-001` put it. No new
+extension, no stored credential, no dependency on caller behaviour for the durability of a security
+record. The benign-failure property is the strongest argument: a caller that ignores the returned
+value still causes **no state change**, because the transition simply did not happen.
+
+**Negative, and the trade-off given up.** The ordinary exception contract. A caller cannot assume
+"no exception means it worked" for the signature path, and that assumption is so common that it is
+the likely source of a future defect. Two things contain it: the return type is a composite that
+cannot be silently coerced to a boolean success, and `URS-TEST-004`'s negative suite carries a test
+asserting that a wrong password leaves the record in its prior state **and** writes exactly one
+`security_event` row.
+
+**On lockout.** This ADR decides how a failed attempt is *recorded*, not what happens after
+repeated failures. Any lockout or escalation reads `security_event`, which this decision is what
+makes possible.
+
+**Residual.** `URS-ESIG-012`'s other limb — *"results reported periodically to management"* — still
+has no owner, as `work/WI-001/THIN-SPECS.md` § Open items records. This ADR does not close it, and
+it needs a URS amendment rather than an invention here.
+
+---
+
 ## 6. Related documents
 
 | Document | Reference |
@@ -501,4 +572,5 @@ same grounds and by the same mechanism.
 | Version | Date | Reason for revision / Author |
 |---|---|---|
 | 0.1 | 2026-08-02 | Initial issue — `ADR-EREC-001` accepted. Juan Miguel Saavedra, Quality Assurance / Computerised System Validation |
+| 0.3 | 2026-08-02 | `ADR-ESIG-001` accepted. Found while implementing `apply_signature`, not while designing it: `URS-ESIG-012` requires a failed signature attempt to be recorded, but a `security_event` row written before a `RAISE` is rolled back with the transaction, so the record of the failure destroys itself. The requirement would have read as satisfied in the source and been unsatisfied in the database. Decision selected by Juan Miguel Saavedra from three alternatives. Juan Miguel Saavedra |
 | 0.2 | 2026-08-02 | Independent review of `WI-001` (`work/WI-001/RESEARCH-REVIEW.md`) returned `changes required`. Three consequences, all before any code was written: (1) `ADR-EREC-001` §5.1.4 carried a factually incorrect claim that a PostgreSQL `timestamptz` preserves a time zone — corrected in place, with the mechanism that does satisfy `URS-DATA-003` moved to `ADR-DATA-002`. The decision `ADR-EREC-001` takes is unchanged; only its justification was wrong. (2) `ADR-DATA-001` added: `URS-DATA-004` requires direct modification to be *prevented*, and the trigger of `ADR-EREC-001` only makes it *detectable*. (3) `ADR-DATA-002` added. Juan Miguel Saavedra |
