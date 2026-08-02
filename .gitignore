@@ -71,3 +71,8 @@ tmp/
 *.tmp.md
 *~
 *.stackdump
+
+# Coverage data (binary artifact)
+.coverage
+.coverage.*
+htmlcov/

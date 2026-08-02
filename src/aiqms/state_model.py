@@ -13,9 +13,22 @@ and need a database. Nothing in this module does.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from collections.abc import Mapping
+from dataclasses import dataclass
 from enum import Enum
+from typing import Protocol
+
+
+class Guard(Protocol):
+    """A guard reads the record's facts and says whether the transition may proceed.
+
+    Declared as a Protocol rather than `Callable[[...], bool]` deliberately: the callable spelling
+    contains a `[[` sequence that `anti-leak-guard.py` matches as a wikilink shape, and the way to
+    live with a gate is to write code it can read, never to weaken the gate. It also names the
+    parameter, which the callable form cannot.
+    """
+
+    def __call__(self, facts: Mapping[str, object]) -> bool: ...
 
 #: `from_state` value meaning "any non-terminal state". Matches the SQL declaration, where the
 #: cancellation row is written once rather than once per state, so a newly added state cannot
@@ -73,7 +86,7 @@ class Transition:
     #: Name of the SQL guard (`aiqms.<guard_name>`) and, optionally, its Python twin. The name is
     #: what the parity test compares; the callable is what makes this module testable alone.
     guard_name: str | None = None
-    guard: Callable[[Mapping[str, object]], bool] | None = None
+    guard: Guard | None = None
 
 
 @dataclass(frozen=True)
