@@ -300,7 +300,7 @@ Does the system generate/store GxP electronic records or use electronic signatur
 | `RA-INIT-019` | `system-level` | The qualified hosted environment drifts from its qualified state through an unassessed infrastructure or platform change | M | M | M | M | M | Change control over the qualified environment; annual periodic review concluding on validated status (`URS-OPS-005`); installation qualification of the documented minimum specification (`URS-HW-001`) | Consider |
 | `RA-INIT-020` | `system-level` | The AI model or a prompt changes in production without re-evaluation, so assistant behaviour shifts underneath a validated system | H | H | H | M | **H** | Model, prompt and context template as configuration items under change control (`URS-QUAL-005`); Change Control plus documented re-evaluation before release (`URS-OPS-006`); versioned evaluation set (`URS-TEST-003`) | Yes |
 
-**Risk Priority = H → proceed to RA-DET** (15 of 20): `RA-INIT-001`, `003`, `004`, `005`, `006`,
+**Risk Priority = H → proceed to RA-DET** (16 of 20): `RA-INIT-001`, `003`, `004`, `005`, `006`,
 `007`, `008`, `009`, `010`, `011`, `013`, `014`, `015`, `016`, `018`, `020`.
 
 Two exposures are recorded here deliberately because they are consequences of decisions taken with
@@ -324,7 +324,7 @@ their arguments on the record, not oversights, and an inspector will read them f
 |---|---|---|
 | `system_impact == high` | **Yes** — PS, PQ and DI all rated H (§5.2) | Yes |
 | `gamp_category` 4 or 5 | **Yes** — Cat 5, bespoke application (§5.3) | Yes |
-| ≥1 function with Risk Priority = H | **Yes** — 15 of 20 register entries (§7) | Yes |
+| ≥1 function with Risk Priority = H | **Yes** — 16 of 20 register entries (§7) | Yes |
 
 **Final decision and justification**: a Detailed Risk Assessment is required. All three triggers
 are present, and the first two are independent of the register — a Cat 5 system with high impact on

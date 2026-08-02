@@ -225,6 +225,11 @@ itself a configuration item, changeable by the Administrator only.
 _Avoid_: "user group", "profile".
 
 **Segregation Invariant**: nobody approves a **Quality Record** they created or investigated.
+The user it is checked against is the signer of the **Opening Signature**, not the account that
+first created the draft row — the opening signature is the signed act that attests the submitted
+content, and a draft typed by one person and submitted under another's signature is attested by the
+signer (decided 2026-08-02, after an independent review found the comparand undefined). Where the
+**Investigation** block was used, the invariant additionally excludes its author.
 One of **four** invariants enforced in code and not configurable away; the others are that no role
 deletes a record (only **Cancellation**), that the Administrator never touches record content,
 and that the **AI Assistant** executes no transition, signature, approval, closure,
@@ -259,8 +264,11 @@ _Avoid_: "the AI" as an actor that "does" anything to a record.
 - A **Change Control** closes when every **Action** it holds marked *pre-closure* is closed. A
   *post-closure* action continues after the change control has closed.
 - A **CAPA** closes only after its **Effectiveness Check** passes, where a **QA Determination**
-  required that check; a failed check returns it to planning. Where the determination waived the
-  check, the CAPA closes on the signed justification instead.
+  required that check. A failed check does **not** return it to planning: QA either extends the
+  horizon, leaving the CAPA open, or closes it on a recorded justification — the two outcomes named
+  under **Effectiveness Check**. Where the plan itself was wrong, a new CAPA is derived rather than
+  the old one reopened. Where the determination waived the check, the CAPA closes on the signed
+  justification instead.
 - A **conditional** **Optional Block** is enabled or waived by exactly one **QA Determination**
   per **Quality Record**, signed, justified, and made at the step its **Record Type** declares.
 - A **Change Control** is approved before implementation when its **Urgency** is normal, and
@@ -344,8 +352,10 @@ responder's decision, never compelled by severity.
 - **Is an Optional Block declared per type, or decided per record?** *Resolved 2026-08-01: both,
   by declaration.* A **Record Type** declares each block **required** or **conditional**; a
   conditional block is enabled or waived per record by a signed, justified **QA Determination**.
-  Two conditional blocks exist: **Finding**→**Investigation** and **CAPA**→**Effectiveness
-  Check**. This replaces the earlier absolute rule that a block "is never partially used" — that
+  **Three** conditional blocks exist: **Deviation**→**Investigation** (determined at **Triage**,
+  with no severity floor — a critical deviation may have its investigation waived, which was
+  stated as a concern and overruled), **Finding**→**Investigation** and
+  **CAPA**→**Effectiveness Check**. This replaces the earlier absolute rule that a block "is never partially used" — that
   rule survives only in the weaker form that a block is used in full or waived, never half-filled.
   Cost accepted: every conditional block doubles the paths its **Record Type** needs verified in
   OQ, and a waived **Effectiveness Check** on a CAPA is an exposed surface in an inspection —
