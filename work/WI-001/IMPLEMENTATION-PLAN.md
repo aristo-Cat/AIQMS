@@ -305,9 +305,13 @@ above.
 
 ## Blockers
 
-1. **T1.3 needs a hosted Supabase project and nothing in this repository names one.**
-   [NEEDS CLARIFICATION: which Supabase project, region and connection string are the qualified target for AI-QMS — the value must come from the human, not be invented here]
-   Not blocking for IS-1 through IS-3 on the local stack; **blocking for `evidence_ready`**.
+1. ~~**T1.3 needs a hosted Supabase project and nothing in this repository names one.**~~
+   **Resolved 2026-08-02.** A hosted project exists and is the qualified target; its reference and
+   region are recorded in `STATE.md`, which is git-ignored, and are deliberately **not published
+   here** — this repository is public, and a project reference appears in every client-side URL of
+   that project. What replaces this blocker is narrower: the **direct database connection string**
+   is still needed for T1.2's pooler half and for T1.4, and it is a secret that belongs in a
+   git-ignored `.env`, never in a tracked file.
 2. **Two URS gaps, already recorded** in `work/WI-001/THIN-SPECS.md` § Open items: `URS-ESIG-008`
    has no owner under Direction A, and `URS-ESIG-012`'s reporting-to-management limb is absent.
    Both are operational controls, so neither blocks this build — both need a URS amendment rather

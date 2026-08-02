@@ -75,7 +75,7 @@ harnesses:
       title: Record Spine and Deviation — create, open with signature, QA Triage,
         segregation invariant, audit trail
       type: feature
-      status: planned
+      status: in_progress
       sdd: true
       interaction: hitl
       spec_refs:
