@@ -96,8 +96,11 @@ is the open question. Judge it properly before implementing rather than after.
   separate work item, not an invention here.
 - **No CI.** Every suite so far was invoked by hand through the management API. There is no
   automated regression on change until the CLI exists.
-- **No coverage figure.** `plpgsql_check 2.8` is available; whether its coverage functions work here
-  is untested. That is T3.5, and `URS-QUAL-002` cannot be claimed before it.
+- **No coverage figure yet — but it is measurable.** Verified 2026-08-02: `plpgsql_check 2.8`
+  installs on this project and exposes `plpgsql_coverage_statements` and
+  `plpgsql_coverage_branches` (plus the profiler API). The enumeration fallback in
+  `RESEARCH-SLICES.md` §5 is therefore **not needed** — the SQL figure can be measured like the
+  Python one. T3.5 is now a run, not an investigation.
 - **T1.5's own pgTAP suite.** The composite key tying a containment action to the same record
   (`URS-FUNC-025`) and the `num_nonnulls` pairing constraints are applied but never exercised.
 
